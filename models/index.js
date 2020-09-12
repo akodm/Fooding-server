@@ -3,9 +3,12 @@ const path = require("path");
 const basename  = path.basename(__filename);
 const Sequelize = require("sequelize");
 
+let config = {};
+process.env.NODE_ENV === "development" ? config = require("../config") : config = require("../config");
+
 const db = {};
  
-const sequelize = new Sequelize(process.env.db, process.env.root, process.env.pass, { host: process.env.host, dialect: process.env.dia, timezone: '+09:00' });
+const sequelize = new Sequelize(config.db, config.root, config.pass, { host: config.host, dialect: config.dia, timezone: '+09:00' });
 
 sequelize.authenticate().then(() => {
     console.log("연결 성공");

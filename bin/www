@@ -10,12 +10,13 @@ var http = require('http');
 
 let models = require('../models');
 let moment = require('moment');
+const config = require("../config");
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT);
+var port = normalizePort(process.env.PORT || config.port);
 app.set('port', port);
 
 /**
@@ -30,7 +31,7 @@ var server = http.createServer(app);
 
 
 models.sequelize.query("SET FOREIGN_KEY_CHECKS = 0", { raw: true }).then(() => {
-  models.sequelize.sync({ force: false }).then(()=>{
+  models.sequelize.sync({ force: true }).then(()=>{
       server.listen(port, async() => {
           console.log(`서버 시작 포트번호 :  ${port}`);
           try {
