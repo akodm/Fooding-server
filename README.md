@@ -4,3 +4,4 @@
 
 -   Mysql ( Sequelize )
 -   CORS
+-   GCP
