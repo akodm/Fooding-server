@@ -5,3 +5,4 @@
 -   Mysql ( Sequelize )
 -   CORS
 -   GCP
+-   Jun & Yul
