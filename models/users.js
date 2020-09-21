@@ -5,14 +5,20 @@ module.exports = (sequelize, DataTypes) => {
             primaryKey : true,
             autoIncrement: true
         },
-        name : {
-            type: DataTypes.STRING,      // 닉네임
+        email : {
+            type: DataTypes.STRING,      // 소셜 로그인 이메일
             allowNull: false
         },
-        pass : {
-            type: DataTypes.STRING,      // 비밀번호
+        name : {
+            type: DataTypes.STRING,      // 설정 닉네임
             allowNull: false
-        }
+        },
+        phone : {
+            type: DataTypes.STRING,      // 설정 전화번호
+        },
+        address : {
+            type: DataTypes.STRING,      // 설정 주소지
+        },
     });
     User.associate = function(models) {
 
