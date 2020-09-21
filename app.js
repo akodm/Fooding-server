@@ -3,6 +3,9 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const cors = require("cors");
+
+const config = process.env.NODE_ENV === "development" ? require("./config") : require("./config");
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -14,6 +17,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+const corsOption = {
+  origin : config.client_url,
+};
+
+app.use(cors(corsOption));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
