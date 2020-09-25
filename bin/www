@@ -8,66 +8,36 @@ var app = require('../app');
 var debug = require('debug')('fooding-server:server');
 var http = require('http');
 
-let models = require('../models');
 let moment = require('moment');
-const config = require("../config");
+moment.locale("ko");
 
-/**
- * Get port from environment and store in Express.
- */
+const { PORT } = process.env;
 
-var port = normalizePort(process.env.PORT || config.port);
+var port = normalizePort(PORT);
 app.set('port', port);
-
-/**
- * Create HTTP server.
- */
 
 var server = http.createServer(app);
 
-/**
- * Listen on provided port, on all network interfaces.
- */
-
-
-models.sequelize.query("SET FOREIGN_KEY_CHECKS = 0", { raw: true }).then(() => {
-  models.sequelize.sync({ force: config.db_force }).then(()=>{
-      server.listen(port, async() => {
-          console.log(`서버 시작 포트번호 :  ${port}`);
-          try {
-              console.log('[현재 시간 : ', moment(new Date()).format("M/D/ddd | HH시mm분]"));
-          } catch(err){
-              console.log("서버 시작 에러 / 데이터베이스 생성 에러 : ", err);
-          }
-      });
-      server.on('error', onError);
-      server.on('listening', onListening);
-  });
+server.listen(port, () => {
+  console.log(`서버 시작 포트번호 :  ${port}`);
+  console.log('[현재 시간 : ', moment(new Date()).format("MM / DD / ddd HH시mm분]"));
 });
-
-/**
- * Normalize a port into a number, string, or false.
- */
+server.on('error', onError);
+server.on('listening', onListening);
 
 function normalizePort(val) {
   var port = parseInt(val, 10);
 
   if (isNaN(port)) {
-    // named pipe
     return val;
   }
 
   if (port >= 0) {
-    // port number
     return port;
   }
 
   return false;
 }
-
-/**
- * Event listener for HTTP server "error" event.
- */
 
 function onError(error) {
   if (error.syscall !== 'listen') {
@@ -78,7 +48,6 @@ function onError(error) {
     ? 'Pipe ' + port
     : 'Port ' + port;
 
-  // handle specific listen errors with friendly messages
   switch (error.code) {
     case 'EACCES':
       console.error(bind + ' requires elevated privileges');
@@ -92,10 +61,6 @@ function onError(error) {
       throw error;
   }
 }
-
-/**
- * Event listener for HTTP server "listening" event.
- */
 
 function onListening() {
   var addr = server.address();
