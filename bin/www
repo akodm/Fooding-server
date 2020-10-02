@@ -17,6 +17,14 @@ var port = normalizePort(PORT);
 app.set('port', port);
 
 var server = http.createServer(app);
+const io = require("socket.io")(server);
+
+io.on('connection', (socket) => {
+  socket.on("chat msg", msg => {
+    console.log("client msg => :", msg);
+    io.emit("chat msg", msg);
+  })
+});
 
 server.listen(port, () => {
   console.log(`서버 시작 포트번호 :  ${port}`);
