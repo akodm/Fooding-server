@@ -15,11 +15,11 @@ function jwtFunction () {
     // access token generator - login request and refresh request
     this.access = (req) => {
         try {
-            const { id, email } = req.user ? req.user : req.query;
+            const { email } = req.user ? req.user : req.query;
             const salt = randonStr();
 
             const payload = {
-                id, email, salt
+                email, salt
             };
 
             console.log(payload, " acs payload");
@@ -40,14 +40,13 @@ function jwtFunction () {
     // refresh token generator - login request
     this.refresh = async (req) => {
         try {
-            const { id, email } = req.query;
+            const { email } = req.query;
             const salt = randonStr();
 
             const payload = {
-                id, email, salt
+                email, salt
             };
 
-            console.log(payload, " ref payload");
             const sign = jwt.sign(payload, REF_KEY, { expiresIn : REF_EXPIRESIN });
             const access_token = this.access(req);
 
@@ -60,7 +59,6 @@ function jwtFunction () {
                 access : access_token
             }, {
                 where : {
-                    id,
                     email
                 }
             });
@@ -93,7 +91,6 @@ function jwtFunction () {
             }
 
             req.user = {
-                id : verify_result.id,
                 email : verify_result.email
             };
 
@@ -121,7 +118,7 @@ function jwtFunction () {
 
             const verify_result = verify(token, false, true);
 
-            if(!verify_result || !verify_result.id) { 
+            if(!verify_result || !verify_result.email) { 
                 throw { 
                     message : "expireAll" 
                 }; 
@@ -130,7 +127,6 @@ function jwtFunction () {
             try {
                 user = await User.findOne({
                     where : {
-                        id : verify_result.id,
                         email : verify_result.email,
                         access : token
                     }
@@ -155,7 +151,6 @@ function jwtFunction () {
             }
 
             req.user = {
-                id : refresh_result.id,
                 email : refresh_result.email
             };
 
@@ -172,7 +167,6 @@ function jwtFunction () {
                     access : access_sign
                 }, {
                     where : {
-                        id : refresh_result.id,
                         email : refresh_result.email
                     }
                 });
