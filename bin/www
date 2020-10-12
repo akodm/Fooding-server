@@ -19,12 +19,21 @@ app.set('port', port);
 var server = http.createServer(app);
 const io = require("socket.io")(server);
 
+/** -------------------------------------- socket event -------------------------------------- */
+
 io.on('connection', (socket) => {
-  socket.on("chat msg", msg => {
-    console.log("client msg => :", msg);
-    io.emit("chat msg", msg);
-  })
+  socket.on('join', function (data) {
+    console.log(data.id, "room join !");
+    socket.join(data.id);
+  });
+
+  socket.on('msg send', (obj) => {
+    console.log(obj, "sned msg !");
+    socket.to(obj.send_id).emit("msg receive", { obj : obj.msg_obj });
+  });
 });
+
+/** -------------------------------------- socket event -------------------------------------- */
 
 server.listen(port, () => {
   console.log(`서버 시작 포트번호 :  ${port}`);

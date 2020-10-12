@@ -70,6 +70,8 @@ router.get("/login", async (req, res, next) => {
             };
         }
 
+        req.query.id = user_result.dataValues.id;
+
         const result = await Token.refresh(req, next);
 
         if(!result) {
@@ -80,7 +82,11 @@ router.get("/login", async (req, res, next) => {
 
         res.send({
             data : true,
-            token : result
+            token : result,
+            user : {
+                email : email,
+                id : user_result.dataValues.id
+            }
         });
     } catch(err) {
         next(err);
@@ -101,8 +107,7 @@ router.get("/login/access", Token.accessVerify, async (req, res, next) => {
 router.post("/create", async (req, res, next) => {
     try {
         const result = await User.create({
-            email : req.body.email,
-            name : req.body.name
+            email : req.body.email
         });
 
         res.send(result);

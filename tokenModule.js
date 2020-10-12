@@ -15,14 +15,13 @@ function jwtFunction () {
     // access token generator - login request and refresh request
     this.access = (req) => {
         try {
-            const { email } = req.user ? req.user : req.query;
+            const { id, email } = req.user ? req.user : req.query;
             const salt = randonStr();
 
             const payload = {
-                email, salt
+                id, email, salt
             };
 
-            console.log(payload, " acs payload");
             const sign = jwt.sign(payload, JWT_KEY, { expiresIn : EXPIRESIN });
 
             if(!sign) { 
@@ -40,11 +39,11 @@ function jwtFunction () {
     // refresh token generator - login request
     this.refresh = async (req) => {
         try {
-            const { email } = req.query;
+            const { id, email } = req.query;
             const salt = randonStr();
 
             const payload = {
-                email, salt
+                id, email, salt
             };
 
             const sign = jwt.sign(payload, REF_KEY, { expiresIn : REF_EXPIRESIN });
@@ -59,7 +58,7 @@ function jwtFunction () {
                 access : access_token
             }, {
                 where : {
-                    email
+                    id, email
                 }
             });
 
@@ -79,7 +78,7 @@ function jwtFunction () {
             const token = req.headers['authorization'];
 
             if(!token) { 
-                return next("acs token null"); 
+                return next("err"); 
             }
             
             const verify_result = verify(token, false, false);
@@ -91,6 +90,7 @@ function jwtFunction () {
             }
 
             req.user = {
+                id : verify_result.id,
                 email : verify_result.email
             };
 
@@ -113,12 +113,12 @@ function jwtFunction () {
             let user = null;
 
             if(!token) { 
-                return next("ref token null"); 
+                return next("err"); 
             }
 
             const verify_result = verify(token, false, true);
 
-            if(!verify_result || !verify_result.email) { 
+            if(!verify_result || !verify_result.email || !verify_result.id) { 
                 throw { 
                     message : "expireAll" 
                 }; 
@@ -127,6 +127,7 @@ function jwtFunction () {
             try {
                 user = await User.findOne({
                     where : {
+                        id : verify_result.id,
                         email : verify_result.email,
                         access : token
                     }
@@ -147,10 +148,11 @@ function jwtFunction () {
                     };
                 }
             } else {
-                return next("Refresh Token Find => User Null");
+                return next("err");
             }
 
             req.user = {
+                id : refresh_result.id,
                 email : refresh_result.email
             };
 
@@ -167,6 +169,7 @@ function jwtFunction () {
                     access : access_sign
                 }, {
                     where : {
+                        id : refresh_result.id,
                         email : refresh_result.email
                     }
                 });

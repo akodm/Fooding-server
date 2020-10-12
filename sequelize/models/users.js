@@ -15,7 +15,9 @@ module.exports = (sequelize) => {
         },
         name : {
             type: DataTypes.STRING,      // 설정 닉네임
-            allowNull: false
+        },
+        image : {
+            type: DataTypes.STRING,      // 설정 이미지
         },
         phone : {
             type: DataTypes.STRING,      // 설정 전화번호

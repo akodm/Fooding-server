@@ -13,20 +13,25 @@ const sequelize = new Sequelize( DB, ROOT, PASS, {
 
 const modelDefiners = [
 	require('./models/users'),
-	require('./models/items'),
+	require('./models/board'),
+	require('./models/room'),
+	require('./models/message'),
 ];
 
 for (const modelDefiner of modelDefiners) {
 	modelDefiner(sequelize);
 }
 
-/**
- *  Sequelize Associate Options Line ------------------------------------
- *  (ex)
- *  const { user, item } = sequelize.models;
- *  user.hasOne(item);
- *  ---------------------------------------------------------------------
- */
+const { board, room, message, user } = sequelize.models;
+
+user.hasMany(board);
+board.belongsTo(user);
+
+room.belongsTo(board);
+board.hasMany(room);
+
+message.belongsTo(room);
+room.hasMany(message);
 
  if(DB_FORCE === "true") {
     sequelize.sync({ force : DB_FORCE });

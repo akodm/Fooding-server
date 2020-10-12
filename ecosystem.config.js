@@ -12,9 +12,6 @@ module.exports = {
     },
     env_production: {
       NODE_ENV: 'production'
-    },
-    watch_options : {
-      followSymlinks : false
     }
   }]
 };

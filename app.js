@@ -11,6 +11,9 @@ const { CLIENT_URL } = process.env;
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var boardRouter = require('./routes/board');
+var roomRouter = require('./routes/room');
+var messageRouter = require('./routes/message');
 
 var app = express();
 
@@ -30,6 +33,9 @@ app.use(cors(corsOption));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/board', boardRouter);
+app.use('/room', roomRouter);
+app.use('/message', messageRouter);
 
 app.use(function(req, res, next) {
   next(createError(404));
