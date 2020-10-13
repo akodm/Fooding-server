@@ -7,13 +7,13 @@ module.exports = (sequelize) => {
 			autoIncrement: true,
 			primaryKey: true,
 			type: DataTypes.INTEGER
-		},
-        target_id : {
-            type: DataTypes.STRING,      // 수신 유저 아이디
+        },
+        user1 : {
+            type: DataTypes.INTEGER,      // 룸의 유저 아이디 1
             allowNull: false
         },
-        send_id : {
-            type: DataTypes.STRING,      // 송신 유저 아이디
+        user2 : {
+            type: DataTypes.INTEGER,      // 룸의 유저 아이디 2
             allowNull: false
         },
     });

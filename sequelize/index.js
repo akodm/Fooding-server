@@ -27,6 +27,9 @@ const { board, room, message, user } = sequelize.models;
 user.hasMany(board);
 board.belongsTo(user);
 
+room.belongsToMany(user, { as: "userId", through: "chatRoom" });
+user.belongsToMany(room, { as: "roomId", through: "chatRoom" });
+
 room.belongsTo(board);
 board.hasMany(room);
 

@@ -8,6 +8,7 @@ const { models } = require("../sequelize");
 
 const Message = models.message;
 
+// 해당 채팅룸의 모든 메시지 가져오기
 router.get("/room/all", async (req, res, next) => {
     const { roomId } = req.query;
 
@@ -15,7 +16,7 @@ router.get("/room/all", async (req, res, next) => {
         const result = await Message.findAll({
             where : {
                 roomId
-            }
+            },
         });
 
         res.send({
@@ -26,6 +27,7 @@ router.get("/room/all", async (req, res, next) => {
     }
 });
 
+// 메시지 생성하기 -> 보낸 이 아이디 및 채팅룸 아이디 필요
 router.post("/create", async (req, res, next) => {
     const { content, category, image, send_id, roomId } = req.body;
 

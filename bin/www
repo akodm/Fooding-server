@@ -21,15 +21,20 @@ const io = require("socket.io")(server);
 
 /** -------------------------------------- socket event -------------------------------------- */
 
-io.on('connection', (socket) => {
+io.sockets.on('connection', (socket) => {
   socket.on('join', function (data) {
-    console.log(data.id, "room join !");
-    socket.join(data.id);
+    const room_name = data.id.toString();
+    console.log(room_name, "room join !");
+    socket.join(room_name);
   });
 
   socket.on('msg send', (obj) => {
-    console.log(obj, "sned msg !");
-    socket.to(obj.send_id).emit("msg receive", { obj : obj.msg_obj });
+    const room_name = obj.target_id.toString();
+    io.sockets.in(room_name).emit('msg receive', { obj : obj.msg });
+  });
+
+  socket.on('user connect', (obj) => {
+    console.log(obj);
   });
 });
 

@@ -9,12 +9,14 @@ const { models } = require("../sequelize");
 const User = models.user;
 const Board = models.board;
 
+// 최근 게시글 순으로 가져오기
 router.get("/all", async (req, res, next) => {
     try {
         const result = await Board.findAll({
             include: [
-                { model: User, attributes: ["name", "address"] }, 
-            ]
+                { model: User, attributes: ["id", "name", "image", "address"] }, 
+            ],
+            order : ["createdAt"]
         });
 
         res.send({
@@ -25,12 +27,10 @@ router.get("/all", async (req, res, next) => {
     }
 });
 
+// 게시글 생성하기
 router.post("/create", async (req, res, next) => {
     const { title, content, image, category, price, negotiation, state } = req.body;
     
-    // id ..
-    // const { } = req.user;
-
     try {
         const result = await Board.create({
             title,

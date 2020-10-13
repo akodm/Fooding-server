@@ -31,11 +31,9 @@ module.exports = (sequelize) => {
         },
         state : {
             type: DataTypes.STRING,      // 판매 혹은 요청 여부
-            allowNull: false
         },
         success : {
             type: DataTypes.STRING,      // 거래 완료 상태
-            allowNull: false
         },
     });
 };

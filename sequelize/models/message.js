@@ -19,7 +19,7 @@ module.exports = (sequelize) => {
             type: DataTypes.STRING,      // 이미지 첨부의 경우 이미지 주소
         },
         send_id : {
-            type: DataTypes.STRING,      // 송신 유저 아이디
+            type: DataTypes.INTEGER,      // 송신 유저 아이디
             allowNull: false
         },
     });

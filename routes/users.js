@@ -9,51 +9,12 @@ const { models } = require("../sequelize");
 
 const User = models.user;
 
-const { CLIENT_ID, CLIENT_SID, SERVER_URL } = process.env;
-
-router.get("/naver/login", async (req, res, next) => {
-    try {
-        const ran = Math.random().toString(36).substr(2,11);
-        res.send({
-            url : `https://nid.naver.com/oauth2.0/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${SERVER_URL}/users/naver/callback&state=${ran}`,
-            state : ran
-        });
-    } catch(err) {
-        next(err);
-    }
-});
-
-router.get("/naver/callback", async (req, res, next) => {
-    try {
-        const code = req.query.code;
-        const state = req.query.state;
-
-        const result = await axios.get(`https://nid.naver.com/oauth2.0/token?client_id=${CLIENT_ID}&client_secret=${CLIENT_SID}&grant_type=authorization_code&state=${state}&code=${code}`);
-
-        const data = result.data;
-
-        if(!data) { throw "user unauthorization"; }
-
-        const user = await axios.get(`https://openapi.naver.com/v1/nid/me`, {
-            headers : {
-                "Authorization" : data.token_type + " " + data.access_token
-            }
-        })
-
-        const user_data = user.data;
-
-        if(user_data.message !== "success") { throw "user unauthorization"; }
-
-        const profile = user_data.response;
-
-        if(!profile.email || !profile.name) { throw "login failed"; }
-
-        res.send(true);
-    } catch(err) {
-        next(err);
-    }
-});
-
+/**
+ * 유저 로그인
+ * 현재 이메일만 받아서 로그인 되는 형태
+ * 현재 이메일 및 아이디 값도 전달하지만, 실제에선 액세스 토큰만 보낼 예정
+ * 해당 엑세스 토큰을 API 마다 검증하여 나온 결과값 (아이디, 이메일)로 API호출 예정
+ */
 router.get("/login", async (req, res, next) => {
     try {
         const { email } = req.query;
@@ -64,7 +25,7 @@ router.get("/login", async (req, res, next) => {
             }
         });
 
-        if(!user_result && !user_result.dataValues) {
+        if(!user_result || !user_result.dataValues) {
             throw {
                 status : 500
             };
@@ -93,17 +54,7 @@ router.get("/login", async (req, res, next) => {
     }
 });
 
-router.get("/login/access", Token.accessVerify, async (req, res, next) => {
-    try {
-        res.send({
-            data : true,
-            user : req.user,
-        });
-    } catch(err) {
-        next(err);
-    }
-});
-
+// 테스트용 유저 생성 API
 router.post("/create", async (req, res, next) => {
     try {
         const result = await User.create({
