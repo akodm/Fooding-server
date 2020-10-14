@@ -9,6 +9,53 @@ const { models } = require("../sequelize");
 
 const User = models.user;
 
+router.get("/one", async (req, res, next) => {
+    const { id } = req.query;
+
+    try {
+        const result = await User.findOne({
+            attributes: ["id", "email", "name", "image", "address", "phone", "createdAt"],
+            where : {
+                id
+            }
+        });
+
+        res.send({
+            data : result
+        });
+    } catch(err) {
+        next(err);
+    }
+});
+
+router.put("/update", async (req, res, next) => {
+    const { image, address, id } = req.body;
+
+    try {
+        await User.update({
+            image,
+            address
+        }, {
+            where : {
+                id
+            }
+        });
+
+        const user = await User.findOne({
+            attributes: ["email", "name", "address", "image", "phone"],
+            where : {
+                id
+            }
+        });
+
+        res.send({
+            data : user
+        });
+    } catch(err) {
+        next(err);;
+    }
+});
+
 /**
  * 유저 로그인
  * 현재 이메일만 받아서 로그인 되는 형태
@@ -45,8 +92,8 @@ router.get("/login", async (req, res, next) => {
             data : true,
             token : result,
             user : {
-                email : email,
-                id : user_result.dataValues.id
+                id : user_result.dataValues.id,
+                email : email
             }
         });
     } catch(err) {
