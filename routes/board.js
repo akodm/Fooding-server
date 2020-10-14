@@ -29,7 +29,7 @@ router.get("/all", async (req, res, next) => {
 
 // 게시글 생성하기
 router.post("/create", async (req, res, next) => {
-    const { title, content, image, category, price, negotiation, state } = req.body;
+    const { title, content, image, category, price, negotiation, state, userId } = req.body;
     
     try {
         const result = await Board.create({
@@ -41,7 +41,7 @@ router.post("/create", async (req, res, next) => {
             negotiation,
             state,
             success: false,
-            userId : req.body.userId
+            userId
         });
 
         res.send({
