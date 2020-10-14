@@ -22,17 +22,26 @@ const io = require("socket.io")(server);
 /** -------------------------------------- socket event -------------------------------------- */
 
 io.sockets.on('connection', (socket) => {
+  // 룸에 조인
   socket.on('join', function (data) {
     const room_name = data.id.toString();
     console.log(room_name, "room join !");
     socket.join(room_name);
   });
 
+  // 메시지 주고 받기
   socket.on('msg send', (obj) => {
     const room_name = obj.target_id.toString();
     io.sockets.in(room_name).emit('msg receive', { obj : obj.msg });
   });
 
+  // 채팅룸 생성 하기
+  socket.on('room create', (obj) => {
+    const room_name = obj.target_id.toString();
+    io.sockets.in(room_name).emit('room receive', { obj : obj.msg });
+  });
+
+  // 접속 유저
   socket.on('user connect', (obj) => {
     console.log(obj);
   });
