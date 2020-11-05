@@ -28,20 +28,22 @@ router.get("/room/all", async (req, res, next) => {
 });
 
 // 메시지 생성하기 -> 보낸 이 아이디 및 채팅룸 아이디 필요
-router.post("/create", async (req, res, next) => {
-    const { content, category, image, send_id, roomId } = req.body;
+router.post("/create", Token.accessVerify, async (req, res, next) => {
+    const { content, category, image, roomId } = req.body;
+    const { token, id } = req.user;
 
     try {
         const result = await Message.create({
             content,
             category,
             image,
-            send_id,
+            userId : id,
             roomId
         });
 
         res.send({
-            data : result
+            data : result,
+            token
         });
     } catch(err) {
         next(err);

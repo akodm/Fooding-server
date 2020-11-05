@@ -73,7 +73,7 @@ function jwtFunction () {
      *  success => req.user + => next();
      *  fail => refresh token verify
      */
-    this.accessVerify = (req, res, next) => {
+    this.accessVerify = async (req, res, next) => {
         try {
             const token = req.headers['authorization'];
 
@@ -89,11 +89,19 @@ function jwtFunction () {
                 }; 
             }
 
+            const userVerify = await User.findOne({
+                where : {
+                    id: verify_result.id,
+                    email: verify_result.email
+                }
+            });
+
+            if(!userVerify || !userVerify.getDataValue("id")) throw 500;
+
             req.user = {
                 id : verify_result.id,
                 email : verify_result.email
             };
-
             return next();
         } catch(err) {
             this.refreshVerify(req, res, next);

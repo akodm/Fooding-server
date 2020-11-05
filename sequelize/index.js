@@ -24,16 +24,22 @@ for (const modelDefiner of modelDefiners) {
 
 const { board, room, message, user } = sequelize.models;
 
+// user <-> board
 user.hasMany(board);
 board.belongsTo(user);
 
+// user <-> room
 room.belongsToMany(user, { as: "userId", through: "chatRoom" });
 user.belongsToMany(room, { as: "roomId", through: "chatRoom" });
 
+// room <-> board
 room.belongsTo(board);
 board.hasMany(room);
 
+// message <-> user / room
+message.belongsTo(user);
 message.belongsTo(room);
+user.hasMany(message);
 room.hasMany(message);
 
  if(DB_FORCE === "true") {
