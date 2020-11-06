@@ -19,9 +19,6 @@ module.exports = (sequelize) => {
         image : {
             type: DataTypes.STRING,      // 설정 이미지
         },
-        phone : {
-            type: DataTypes.STRING,      // 설정 전화번호
-        },
         address : {
             type: DataTypes.STRING,      // 설정 주소지
         },

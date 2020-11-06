@@ -54,15 +54,78 @@ router.get("/login/storage", Token.accessVerify,  async (req, res, next) => {
     }
 });
 
+router.get("/one", Token.accessVerify, async (req, res, next) => {
+    const { token, id, email } = req.user;
+
+    try {
+        const result = await User.findOne({
+            attributes: ["id, name, image, address"],
+            where: {
+                id,
+                email
+            }
+        });
+
+        res.send({
+            data: result,
+            token
+        });
+    } catch(err) {
+        next(err);
+    }
+});
+
 router.post("/create", async (req, res, next) => {
     const { email } = req.body;
     try {
         const result = await User.create({
-            email,
+            email
         });
 
         console.log("User Craete :", result.dataValues);
         res.send(result);
+    } catch(err) {
+        next(err);
+    }
+});
+
+router.put("/update", Token.accessVerify, async (req, res, next) => {
+    const { token, id, email } = req.user;
+    const { image, address } = req.body;
+
+    try {
+        const result = await User.update({
+            image,
+            address,
+        }, {
+            where: {
+                id,
+                email
+            }
+        });
+
+        res.send({
+            data: result,
+            token
+        });
+    } catch(err) {
+        next(err);
+    }
+});
+
+router.delete("/delete", Token.accessVerify, async (req, res, next) => {
+    const { id, email } = req.user;
+    try {
+        await User.destroy({
+            where: {
+                id,
+                email
+            }
+        });
+
+        res.send({
+            data: true
+        });
     } catch(err) {
         next(err);
     }
