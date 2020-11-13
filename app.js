@@ -1,21 +1,22 @@
 require("dotenv").config();
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+let createError = require('http-errors');
+let express = require('express');
+let path = require('path');
+let cookieParser = require('cookie-parser');
+let logger = require('morgan');
 const helmet = require("helmet");
 const cors = require("cors");
 
 const { CLIENT_URL } = process.env;
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var boardRouter = require('./routes/board');
-var roomRouter = require('./routes/room');
-var messageRouter = require('./routes/message');
+let indexRouter = require('./routes/index');
+let usersRouter = require('./routes/users');
+let boardRouter = require('./routes/board');
+let roomRouter = require('./routes/room');
+let messageRouter = require('./routes/message');
+let socketRouter = require('./routes/socket');
 
-var app = express();
+let app = express();
 
 app.use(helmet());
 app.use(logger('dev'));
@@ -36,6 +37,7 @@ app.use('/users', usersRouter);
 app.use('/board', boardRouter);
 app.use('/room', roomRouter);
 app.use('/message', messageRouter);
+app.use('/socket', socketRouter);
 
 app.use(function(req, res, next) {
   next(createError(404));

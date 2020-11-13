@@ -4,50 +4,25 @@
  * Module dependencies.
  */
 
-var app = require('../app');
-var debug = require('debug')('fooding-server:server');
-var http = require('http');
+let app = require('../app');
+let debug = require('debug')('fooding-server:server');
+let http = require('http');
 
 let moment = require('moment');
 moment.locale("ko");
 
 const { PORT } = process.env;
 
-var port = normalizePort(PORT);
+let port = normalizePort(PORT);
 app.set('port', port);
 
-var server = http.createServer(app);
-const io = require("socket.io")(server);
-
-/** -------------------------------------- socket event -------------------------------------- */
-
-io.sockets.on('connection', (socket) => {
-  // 룸에 조인
-  socket.on('join', function (data) {
-    const room_name = data.id.toString();
-    console.log(room_name, "room join !");
-    socket.join(room_name);
-  });
-
-  // 메시지 주고 받기
-  socket.on('msg send', (obj) => {
-    const room_name = obj.target_id.toString();
-    io.sockets.in(room_name).emit('msg receive', { obj : obj.msg });
-  });
-
-  // 채팅룸 생성 하기
-  socket.on('room create', (obj) => {
-    const room_name = obj.target_id.toString();
-    io.sockets.in(room_name).emit('room receive', { obj : obj.msg });
-  });
-
-  // 접속 유저
-  socket.on('user connect', (obj) => {
-    console.log(obj);
-  });
+let server = http.createServer(app);
+const io = require("socket.io")(server, {
+  path: "/socket",
+  transports: ["websocket"]
 });
 
-/** -------------------------------------- socket event -------------------------------------- */
+require('../socket')(io);
 
 server.listen(port, () => {
   console.log(`서버 시작 포트번호 :  ${port}`);
@@ -57,7 +32,7 @@ server.on('error', onError);
 server.on('listening', onListening);
 
 function normalizePort(val) {
-  var port = parseInt(val, 10);
+  let port = parseInt(val, 10);
 
   if (isNaN(port)) {
     return val;
@@ -75,7 +50,7 @@ function onError(error) {
     throw error;
   }
 
-  var bind = typeof port === 'string'
+  let bind = typeof port === 'string'
     ? 'Pipe ' + port
     : 'Port ' + port;
 
@@ -94,8 +69,8 @@ function onError(error) {
 }
 
 function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string'
+  let addr = server.address();
+  let bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
