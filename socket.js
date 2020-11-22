@@ -2,19 +2,30 @@ const { onEvent, emitEvent } = require("./socketConsts");
 
 module.exports = (io) => {
   io.sockets.on(onEvent.CONNECTION, (socket) => {
-    // on events
-    console.log(socket.handshake.query.token);
-
-    socket.on(onEvent.LOGIN, (data) => {
-      console.log("user connect !", data);
+    // client to server pong test
+    socket.on(onEvent.PONG, (data) => {
+      console.log("server socket pong event:", data);
     });
 
+    // user login & connection
+    socket.on(onEvent.LOGIN, (id) => {
+      console.log("user login & join socket room:", (id).toString());
+      console.log("user login token:", socket.handshake.query.token);
+      const stringId = (id).toString();
+      socket.join(stringId);
+    });
 
+    // message send & message emit to target room user
+    socket.on(onEvent.MESSAGE_SEND, (data) => {
+      console.log("msg on:", data.id, data.message);
+      const stringId = (data.id).toString();
+      io.socket.to(stringId).emit(emitEvent.MESSAGE_RECEIVE, data.message);
+    });
 
-
-
-
-    // emit events
-    socket.emit(emitEvent.PING, { text: "ping" });
+    // disconnect user
+    socket.on(onEvent.DISCONNECT, (data) => {
+      console.log("user disconnect & token:", socket.handshake.query.token);
+      console.log(data);
+    });
   }); 
 }

@@ -1,10 +1,15 @@
 module.exports = {
   onEvent: {
     CONNECTION: "connection",
-    LOGIN: "login"
+    DISCONNECT: "disconnect",
+    LOGIN: "login",
+
+    MESSAGE_SEND: "message send",
+
+    PONG: "socket pong",
   },
 
   emitEvent: {
-    PING: "ping"
+    MESSAGE_RECEIVE: "message receive"
   }
 }

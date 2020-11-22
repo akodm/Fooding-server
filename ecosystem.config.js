@@ -4,7 +4,15 @@ module.exports = {
     script: './bin/www',
     instances: 4,
     watch: true,
-    ignore_watch : ['node_modules','public'],
+    ignore_watch : [
+      'node_modules',
+      'public',
+      '.git',
+      './ecosystem.config.js',
+      'socket.js',
+      'socketConsts.js',
+      '.env'
+    ],
     exec_mode : 'cluster',
     wait_ready: true,
     max_restarts: 2,

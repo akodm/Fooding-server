@@ -3,6 +3,7 @@ node_modules
 .env
 __test__/*.test.js
 
+serverlogic
 server-guide
 
 cryptoFunction.js
