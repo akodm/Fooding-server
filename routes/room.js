@@ -5,6 +5,7 @@ const token_require = require("../tokenModule");
 const Token = new token_require();
 
 const models = require("../sequelize");
+const sequelize = require('../sequelize');
 
 const Board = models.models.board;
 const Room = models.models.room;
@@ -13,16 +14,8 @@ const ChatRoom = models.models.chatRoom;
 
 const Op = models.Sequelize.Op;
 
-/**
- * 해당 유저가 속해있는 채팅방 찾기
- * -> 채팅 룸
- *  -> 게시판 정보
- *  -> 유저 정보 1
- *  -> 유저 정보 2
- */
-router.get("/user/all", async (req, res, next) => {
+router.get("/user/all/include/message", async (req, res, next) => {
     const { userId } = req.query;
-
     try {
         const result = await Room.findAll({
             where : {
@@ -41,19 +34,29 @@ router.get("/user/all", async (req, res, next) => {
             }],
         });
 
-        res.send({
-            data : result
+        // room latest message
+        const messageGet = result.map(data => {
+            return data.getMessages({
+                limit: 1,
+                order: [["id", "DESC"]]
+            });
         });
+        const parserResult = await Promise.all(messageGet);
+
+        const newResult = result.map((data, index) => {
+            return {
+                room: data,
+                message: parserResult[index][0]
+            }
+        });
+
+        res.send(newResult);
     } catch(err) {
-        next(err);
+        console.log(err);
     }
 });
 
-/**
- * 채팅 방 생성하기
- * -> 유저 1, 유저2, 게시판 아이디 참조
- *  -> 채팅방 내역에 유저 추가 ( 유저1, 채팅룸 아이디 / 유저2, 채팅룸 아이디 )
- */
+// Token.accessVerify
 router.post("/create", async (req, res, next) => {
     const { boardId, user1, user2 } = req.body;
 
@@ -83,50 +86,49 @@ router.post("/create", async (req, res, next) => {
 
         if(overlap && overlap.dataValues) {
             res.send({
-                data : overlap.dataValues,
+                data : overlap,
                 ovl : true
             });
             return false;
         }
 
-        const result = await Room.create({
-            boardId,
-            user1,
-            user2
-        });
-
-        if(!result) throw 500;
-        
-        const roomId = result.getDataValue("id");
-
-        if(!roomId) throw 500;
-
-        await ChatRoom.bulkCreate([
-            {
-                roomId, userId : user1
-            }, {
-                roomId, userId : user2
-            }
-        ]);
-
-        const data = await Room.findOne({
-            include: [{ 
-                model: User, 
-                as: "userId",
-                required: true,
-                attributes: ["id", "name", "address", "image"],
-            }, {
-                model: Board
-            }],
-            where : {
+        const resultData = await sequelize.transaction(async (t) => {
+            const room = await Room.create({
                 boardId,
                 user1,
                 user2
-            }
-        })
+            }, { transaction: t });
+    
+            const roomId = room.getDataValue("id");
+    
+            if(!roomId) throw 500;
+    
+            await ChatRoom.bulkCreate([
+                { roomId, userId : user1 }, 
+                { roomId, userId : user2 }
+            ], { transaction: t });
+    
+            const data = await Room.findOne({
+                include: [{ 
+                    model: User, 
+                    as: "userId",
+                    required: true,
+                    attributes: ["id", "name", "address", "image"],
+                }, {
+                    model: Board
+                }],
+                where : {
+                    boardId,
+                    user1,
+                    user2
+                }
+            });
+
+            return data;
+        });
 
         res.send({
-            data,
+            data: resultData,
             ovl : false
         });
     } catch(err) {

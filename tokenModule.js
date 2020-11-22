@@ -68,17 +68,13 @@ function jwtFunction () {
         }
     }
 
-    /**
-     *  access token verify
-     *  success => req.user + => next();
-     *  fail => refresh token verify
-     */
+    // access token verify - api request flow
     this.accessVerify = async (req, res, next) => {
         try {
             const token = req.headers['authorization'];
 
             if(!token) { 
-                return next("err"); 
+                return next("unauthorized user"); 
             }
             
             const verify_result = verify(token, false, false);
@@ -96,7 +92,7 @@ function jwtFunction () {
                 }
             });
 
-            if(!userVerify || !userVerify.getDataValue("id")) throw 500;
+            if(!userVerify || !userVerify.getDataValue("id")) return next("user not exist");
 
             req.user = {
                 id : verify_result.id,
@@ -108,12 +104,7 @@ function jwtFunction () {
         }
     }
 
-    /**
-     *  refresh token verify
-     *  success => req.user + => next();
-     *  fail => err.message : expireAll => next(err);
-     *  res.send("expireAll");
-     */
+    // refresh token verify - login & access expire flow
     this.refreshVerify = async (req, res, next) => {
         try {
             const token = req.headers['authorization'];
@@ -121,7 +112,7 @@ function jwtFunction () {
             let user = null;
 
             if(!token) { 
-                return next("err"); 
+                return next("unauthorized user"); 
             }
 
             const verify_result = verify(token, false, true);
@@ -156,7 +147,7 @@ function jwtFunction () {
                     };
                 }
             } else {
-                return next("err");
+                return next("user not exist");
             }
 
             req.user = {
@@ -168,7 +159,7 @@ function jwtFunction () {
 
             if(!access_sign) {
                 throw {
-                    message : "err"
+                    message : "token generator err"
                 };
             }
 
@@ -194,6 +185,7 @@ function jwtFunction () {
         }
     }
 
+    // token verify function
     function verify (token, refresh, ignore) {
         try {
             const key = refresh ? REF_KEY : JWT_KEY;
@@ -209,6 +201,7 @@ function jwtFunction () {
         return false;
     }
 
+    // salt generator function
     function randonStr () {
         const str = Math.random().toString(36).substr(2,8);
 

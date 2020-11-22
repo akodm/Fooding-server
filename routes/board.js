@@ -28,11 +28,11 @@ router.get("/all", async (req, res, next) => {
 });
 
 // 게시글 생성하기
-router.post("/create", Token.accessVerify, async (req, res, next) => {
-    const { title, content, image, category, price, negotiation, state } = req.body;
-    const { token, id } = req.user;
+// Token.accessVerify
+router.post("/create", async (req, res, next) => {
+    const { title, content, image, category, price, negotiation, state, userId } = req.body;
+    // const { token, id } = req.user;
     try {
-
         const result = await Board.create({
             title,
             content,
@@ -42,23 +42,23 @@ router.post("/create", Token.accessVerify, async (req, res, next) => {
             negotiation,
             state,
             success: false,
-            userId: id
+            userId
         });
 
-        const Boardid = result.getDataValue("id");
+        const BoardId = result.getDataValue("id");
 
         const board = await Board.findOne({
             include: [
                 { model: User, attributes: ["id", "name", "image", "address"] }, 
             ],
             where : {
-                id: Boardid
+                id: BoardId
             }
         });
 
         res.send({
             data : board,
-            token
+            // token
         });
     } catch(err) {
         next(err);

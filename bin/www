@@ -24,6 +24,8 @@ const io = require("socket.io")(server, {
 
 require('../socket')(io);
 
+require('../redis');
+
 server.listen(port, () => {
   console.log(`서버 시작 포트번호 :  ${port}`);
   console.log('[현재 시간 : ', moment(new Date()).format("MM / DD / ddd HH시mm분]"));

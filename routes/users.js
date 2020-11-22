@@ -5,6 +5,7 @@ const token_require = require("../tokenModule");
 const Token = new token_require();
 
 const { models } = require("../sequelize");
+const redis = require('../redis');
 
 const User = models.user;
 
@@ -17,12 +18,12 @@ router.get("/login/init", async (req, res, next) => {
             }
         });
 
-        if(!userResult || !userResult.dataValues) throw { status : 500 };
+        if(!userResult || !userResult.dataValues) throw { status : "null user" };
 
         req.query.id = userResult.dataValues.id;
         const token = await Token.refresh(req, next);
 
-        if(!token) throw { status : 500 };
+        if(!token) throw { status : "token create err" };
 
         res.send({
             data : true,
@@ -37,7 +38,7 @@ router.get("/login/init", async (req, res, next) => {
     }
 });
 
-router.get("/login/storage", Token.accessVerify,  async (req, res, next) => {
+router.get("/login/storage", Token.accessVerify, async (req, res, next) => {
     try {
         const { token, id, email } = req.user;
 
@@ -75,15 +76,45 @@ router.get("/one", Token.accessVerify, async (req, res, next) => {
     }
 });
 
+router.get("/create/check", async (req, res, next) => {
+    const { email } = req.query;
+    try {
+        const result = await User.findOne({
+            where : {
+                email
+            }
+        });
+
+        const create = (result && result.getDataValue("id")) ? true : false;
+
+        res.send({
+            create
+        });
+    } catch(err) {
+        next(err);
+    }
+});
+
 router.post("/create", async (req, res, next) => {
     const { email } = req.body;
     try {
+        const user = await User.findOne({
+            where: {
+                email
+            }
+        });
+
+        if(user && user.getDataValue("id")) throw "already created user";
+
         const result = await User.create({
             email
         });
 
         console.log("User Craete :", result.dataValues);
-        res.send(result);
+        res.send({
+            data: result,
+            create: true
+        });
     } catch(err) {
         next(err);
     }
