@@ -22,9 +22,9 @@ const io = require("socket.io")(server, {
   transports: ["websocket"]
 });
 
-require('../socket')(io);
-
 require('../redis');
+require('../sequelize');
+require('../socket')(io);
 
 server.listen(port, () => {
   console.log(`서버 시작 포트번호 :  ${port}`);
