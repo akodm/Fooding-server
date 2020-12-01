@@ -60,7 +60,7 @@ router.get("/one", Token.accessVerify, async (req, res, next) => {
 
     try {
         const result = await User.findOne({
-            attributes: ["id, name, image, address"],
+            attributes: ["id", "name", "image", "address"],
             where: {
                 id,
                 email
@@ -80,6 +80,7 @@ router.get("/create/check", async (req, res, next) => {
     const { email } = req.query;
     try {
         const result = await User.findOne({
+            attributes: ["id"],
             where : {
                 email
             }
