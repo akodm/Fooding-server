@@ -15,6 +15,7 @@ let boardRouter = require('./routes/board');
 let roomRouter = require('./routes/room');
 let messageRouter = require('./routes/message');
 let socketRouter = require('./routes/socket');
+let filterRouter = require('./routes/filter');
 
 let app = express();
 
@@ -38,6 +39,7 @@ app.use('/board', boardRouter);
 app.use('/room', roomRouter);
 app.use('/message', messageRouter);
 app.use('/socket', socketRouter);
+app.use('/filter', filterRouter);
 
 app.use(function(req, res, next) {
   next(createError(404));
