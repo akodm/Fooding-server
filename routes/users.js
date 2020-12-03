@@ -126,7 +126,7 @@ router.put("/update", Token.accessVerify, async (req, res, next) => {
     const { image, address } = req.body;
 
     try {
-        const result = await User.update({
+        await User.update({
             image,
             address,
         }, {
@@ -135,9 +135,9 @@ router.put("/update", Token.accessVerify, async (req, res, next) => {
                 email
             }
         });
-
+        
         res.send({
-            data: result,
+            data: true,
             token
         });
     } catch(err) {
