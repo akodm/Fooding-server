@@ -108,7 +108,8 @@ router.post("/create", async (req, res, next) => {
         if(user && user.getDataValue("id")) throw "already created user";
 
         const result = await User.create({
-            email
+            email,
+            kind: 36.5
         });
 
         console.log("User Craete :", result.dataValues);

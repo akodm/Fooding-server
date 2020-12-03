@@ -22,6 +22,9 @@ module.exports = (sequelize) => {
         address : {
             type: DataTypes.STRING,      // 설정 주소지
         },
+        kind : {
+            type: DataTypes.DOUBLE,      // 친절도 수치
+        },
         access : {
             type: DataTypes.STRING,      // 엑세스 토큰
         },
