@@ -46,7 +46,7 @@ router.get("/user/all/include/message", async (req, res, next) => {
         const newResult = result.map((data, index) => {
             return {
                 room: data,
-                message: parserResult[index][0]
+                message: parserResult[index][0] || null
             }
         });
 
@@ -92,7 +92,7 @@ router.post("/create", async (req, res, next) => {
             return false;
         }
 
-        const resultData = await sequelize.transaction(async (t) => {
+        await sequelize.transaction(async (t) => {
             const room = await Room.create({
                 boardId,
                 user1,
@@ -107,28 +107,27 @@ router.post("/create", async (req, res, next) => {
                 { roomId, userId : user1 }, 
                 { roomId, userId : user2 }
             ], { transaction: t });
-    
-            const data = await Room.findOne({
-                include: [{ 
-                    model: User, 
-                    as: "userId",
-                    required: true,
-                    attributes: ["id", "name", "address", "image"],
-                }, {
-                    model: Board
-                }],
-                where : {
-                    boardId,
-                    user1,
-                    user2
-                }
-            });
-
-            return data;
         });
 
+        const data = await Room.findOne({
+            include: [{ 
+                model: User, 
+                as: "userId",
+                required: true,
+                attributes: ["id", "name", "address", "image"],
+            }, {
+                model: Board
+            }],
+            where : {
+                boardId,
+                user1,
+                user2
+            }
+        });
+
+
         res.send({
-            data: resultData,
+            data,
             ovl : false
         });
     } catch(err) {

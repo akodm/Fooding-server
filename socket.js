@@ -18,9 +18,16 @@ module.exports = (io) => {
   
       // message send & message emit to target room user
       socket.on(onEvent.MESSAGE_SEND, (data) => {
-        console.log("msg on:", data.id, data.message);
-        const stringId = (data.id).toString();
-        io.socket.to(stringId).emit(emitEvent.MESSAGE_RECEIVE, data.message);
+        console.log("msg on:", data.target, data.message);
+        const stringId = (data.target).toString();
+        io.sockets.to(stringId).emit(emitEvent.MESSAGE_RECEIVE, data.message);
+        io.sockets.to(stringId).emit(emitEvent.CHAT_UPDATE, data.message);
+      });
+
+      socket.on(onEvent.ROOM_IN, (data) => {
+        console.log("user chat room in:", data);
+        const stringId = (data.user.id).toString();
+        io.sockets.to(stringId).emit(emitEvent.MESSAGE_READ, { roomId: data.roomId, read: true });
       });
   
       // disconnect user
