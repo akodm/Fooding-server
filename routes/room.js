@@ -52,7 +52,7 @@ router.get("/user/all/include/message", async (req, res, next) => {
 
         res.send(newResult);
     } catch(err) {
-        console.log(err);
+        next(err);
     }
 });
 

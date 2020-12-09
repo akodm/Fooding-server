@@ -7,20 +7,26 @@ const Token = new token_require();
 const { models } = require("../sequelize");
 
 const Message = models.message;
+const User = models.user;
 
 // 해당 채팅룸의 모든 메시지 가져오기
-router.get("/room/all", async (req, res, next) => {
+router.get("/room/all", Token.accessVerify, async (req, res, next) => {
     const { roomId } = req.query;
+    const { token } = req.user;
 
     try {
         const result = await Message.findAll({
+            include: [
+                { model: User, attributes: ["id", "name", "image", "address"] }, 
+            ],
             where : {
                 roomId
             },
         });
 
         res.send({
-            data : result
+            data : result,
+            token
         });
     } catch(err) {
         next(err);
