@@ -5,7 +5,6 @@ const token_require = require("../tokenModule");
 const Token = new token_require();
 
 const { models } = require("../sequelize");
-const redis = require('../redis');
 
 const User = models.user;
 

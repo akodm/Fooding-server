@@ -14,8 +14,10 @@ const ChatRoom = models.models.chatRoom;
 
 const Op = models.Sequelize.Op;
 
-router.get("/user/all/include/message", async (req, res, next) => {
+router.get("/user/all/include/message", Token.accessVerify, async (req, res, next) => {
     const { userId } = req.query;
+    const { token } = req.user;
+
     try {
         const result = await Room.findAll({
             where : {
@@ -50,7 +52,10 @@ router.get("/user/all/include/message", async (req, res, next) => {
             }
         });
 
-        res.send(newResult);
+        res.send({
+            data: newResult,
+            token
+        });
     } catch(err) {
         next(err);
     }
@@ -59,10 +64,12 @@ router.get("/user/all/include/message", async (req, res, next) => {
 // Token.accessVerify
 router.post("/create", async (req, res, next) => {
     const { boardId, user1, user2 } = req.body;
+    const { token } = req.user;
 
     if(user1 === user2) {
         res.send({
-            data : false
+            data : false,
+            token
         });
         return false;
     }
@@ -87,7 +94,8 @@ router.post("/create", async (req, res, next) => {
         if(overlap && overlap.dataValues) {
             res.send({
                 data : overlap,
-                ovl : true
+                ovl : true,
+                token
             });
             return false;
         }
@@ -128,7 +136,8 @@ router.post("/create", async (req, res, next) => {
 
         res.send({
             data,
-            ovl : false
+            ovl : false,
+            token
         });
     } catch(err) {
         next(err);
